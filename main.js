@@ -1,5 +1,5 @@
 const title1 = document.querySelector('#title_1 span');
-const title2 = document.querySelector('#title_2 span');
+const title2 = document.querySelector('#title_2');
 const head1 = document.getElementById('head_1');
 const head2 = document.getElementById('head_2');
 const head3 = document.getElementById('head_3');
@@ -26,12 +26,20 @@ const modalPic = document.querySelectorAll('.modal_pic');
 const nextBtn = document.getElementById('next_button');
 const prevBtn = document.getElementById('prev_button');
 const playBtn = document.getElementById('play_button');
+const submitBtn = document.getElementById('submit');
+const form = document.querySelector('form');
+const messageStatus = document.getElementById('message_status');
 let auto = false;
 let slideInterval;
 
+// Set the real Viewport-height for mobile devices
+
+let vh = window.innerHeight * 0.01;
+document.documentElement.style.setProperty('--vh', `${vh}px`);
+
 // Animation Landingpage
 
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('load', () => {
     title1.style.left = "50%";
     title2.style.right = "50%";
 
@@ -289,7 +297,7 @@ window.addEventListener('resize', () => {
         burger.classList.remove('burgeranim');
         navUlli.forEach((link, index) => {
             if (link.style.animation) {
-                link.style.animation ="";
+                link.style.animation = "";
             }
         })
     }
@@ -314,9 +322,11 @@ topBtn.addEventListener('click', () => {
 
 // Nav-Link Animation when scrolling through sections
 
+console.log(anchorHome.getBoundingClientRect().top);
+
 if (window.innerWidth >= 760) {
     window.addEventListener('scroll', () => {
-        if (anchorHome.getBoundingClientRect().top <= 0 && anchorHome.getBoundingClientRect().top > -653.5) {
+        if (anchorHome.getBoundingClientRect().top <= 0 && anchorHome.getBoundingClientRect().top > -653) {
             navUla[0].classList.add('fill_anim');
             navUla[0].style.color = "rgb(54, 133, 235)";
             navUla[0].style.opacity = ".7";
@@ -325,7 +335,7 @@ if (window.innerWidth >= 760) {
             navUla[0].style.color = "";
             navUla[0].style.opacity = ".7";
         }
-        if (anchorHome.getBoundingClientRect().top <= -653.5 && anchorHome.getBoundingClientRect().top > -2137) {
+        if (anchorHome.getBoundingClientRect().top <= -653 && anchorHome.getBoundingClientRect().top > -2136) {
             navUla[1].classList.add('fill_anim');
             navUla[1].style.color = "rgb(54, 133, 235)";
             navUla[1].style.opacity = ".7";
@@ -334,7 +344,7 @@ if (window.innerWidth >= 760) {
             navUla[1].style.color = "";
             navUla[1].style.opacity = ".7";
         }
-        if (anchorHome.getBoundingClientRect().top <= -2137 && anchorHome.getBoundingClientRect().top > -3285) {
+        if (anchorHome.getBoundingClientRect().top <= -2136 && anchorHome.getBoundingClientRect().top > -3284) {
             navUla[2].classList.add('fill_anim');
             navUla[2].style.color = "rgb(54, 133, 235)";
             navUla[2].style.opacity = ".7";
@@ -343,7 +353,7 @@ if (window.innerWidth >= 760) {
             navUla[2].style.color = "";
             navUla[2].style.opacity = ".7";
         }
-        if (anchorHome.getBoundingClientRect().top <= -3285 && anchorHome.getBoundingClientRect().top > -6504) {
+        if (anchorHome.getBoundingClientRect().top <= -3284 && anchorHome.getBoundingClientRect().top > -6503) {
             navUla[3].classList.add('fill_anim');
             navUla[3].style.color = "rgb(54, 133, 235)";
             navUla[3].style.opacity = ".7";
@@ -352,7 +362,7 @@ if (window.innerWidth >= 760) {
             navUla[3].style.color = "";
             navUla[3].style.opacity = ".7";
         }
-        if (anchorHome.getBoundingClientRect().top <= -6504) {
+        if (anchorHome.getBoundingClientRect().top <= -6503) {
             navUla[5].classList.add('fill_anim');
             navUla[5].style.color = "rgb(54, 133, 235)";
             navUla[5].style.opacity = ".7";
@@ -362,4 +372,45 @@ if (window.innerWidth >= 760) {
             navUla[5].style.opacity = ".7";
         }
     })
-}
+    }
+
+
+// AJAX contact form
+
+form.addEventListener('submit', e => {;
+    e.preventDefault();
+    submitBtn.disabled = true;
+    let formdata = new FormData(form);
+    let xhr = new XMLHttpRequest();
+    xhr.open('POST', 'form.php', true);
+    xhr.onload = function() {
+        if (this.status == 200) {
+            console.log(this.responseText);
+            if (xhr.responseText == "success") {
+                if(messageStatus.classList.contains('message_failed')) {
+                    messageStatus.classList.remove('message_failed');
+                }
+                messageStatus.classList.add('message_sent');
+                messageStatus.textContent = "Ihre Nachricht wurde erfolgreich versendet!";
+                form.reset();
+                submitBtn.disabled = false;
+            } else if (xhr.responseText == "failed email") {
+                messageStatus.classList.add('message_failed');
+                messageStatus.textContent = "Geben Sie eine gültige E-mail Adresse ein!";
+                submitBtn.disabled = false;
+            } else if (xhr.responseText == "no text") {
+                messageStatus.classList.add('message_failed');
+                messageStatus.textContent = "Füllen Sie bitte alle Felder aus!";
+                submitBtn.disabled = false;
+            } else {
+                messageStatus.classList.add('message_failed');
+                messageStatus.textContent = "Ihre Nachricht konnte nicht versendet werden!";
+                submitBtn.disabled = false;
+            }
+        }
+    }
+    xhr.send(formdata);
+})
+
+
+
